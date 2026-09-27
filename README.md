@@ -1,4 +1,4 @@
-# ngIRCd Container
+# ngIRCd-container
 
 This repository contains the files needed to build and run ngIRCd as a container image based on AlmaLinux 10.
 

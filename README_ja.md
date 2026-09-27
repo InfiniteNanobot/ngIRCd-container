@@ -1,4 +1,4 @@
-# ngIRCd コンテナ
+# ngIRCd-container
 
 このリポジトリでは、AlmaLinux 10 をベースに ngIRCd のコンテナイメージをビルド・実行するためのファイルを管理します。
 
