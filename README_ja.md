@@ -11,7 +11,9 @@
 
 ## ビルドと実行
 
-設定ファイルを追加した後、Podman でイメージをビルドして起動します。
+ビルド前に設定ファイルを追加してください。ngIRCd がコンテナ外からアクセス可能なアドレスのポート `6667` で待ち受けるように設定し、`MotdFile = /etc/ngircd.motd` を指定してください。PID ファイルを設定する場合は `/run/ngircd` 以下に置いてください。ファイルは `ngircd` ユーザーから読み取り可能にする必要があります。
+
+Podman でイメージをビルドして起動します。
 
 ```sh
 podman build -t ngircd-container -f Containerfile .
@@ -22,4 +24,4 @@ podman run --rm --name ngircd -p 6667:6667 ngircd-container
 
 設定を変更するには `config/ngircd.conf` を編集してイメージを再ビルドしてください。インターネットに公開する前に、設定内容とアクセス制御を確認してください。
 
-> **注:** `Containerfile` は `config/ngircd.conf` と `config/ngircd.motd` を参照します。これらのファイルはまだ追加されていないため、追加するまではイメージをビルドできません。
+> **注:** 現在 EPEL 10 には ngIRCd がないため、AlmaLinux 10 イメージには署名済みの EPEL 9 パッケージをインストールします。`Containerfile` は `config/ngircd.conf` と `config/ngircd.motd` を参照します。これらのファイルはまだ追加されていないため、追加するまではイメージをビルドできません。
