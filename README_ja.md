@@ -7,21 +7,26 @@
 - `Containerfile` — EPEL から ngIRCd をインストールし、非 root ユーザーでフォアグラウンド実行します。
 - `config/ngircd.conf` — イメージ内に配置する ngIRCd の設定ファイル。
 - `config/ngircd.motd` — 接続したクライアントに表示する MOTD（Message of the Day）。
+- `tests/smoke.py` — Podman でイメージをビルドし、IRC 接続をテストします。
 - `README.md` — 英語版の説明。
 
 ## ビルドと実行
-
-ビルド前に設定ファイルを追加してください。ngIRCd がコンテナ外からアクセス可能なアドレスのポート `6667` で待ち受けるように設定し、`MotdFile = /etc/ngircd.motd` を指定してください。PID ファイルを設定する場合は `/run/ngircd` 以下に置いてください。ファイルは `ngircd` ユーザーから読み取り可能にする必要があります。
 
 Podman でイメージをビルドして起動します。
 
 ```sh
 podman build -t ngircd-container -f Containerfile .
-podman run --rm --name ngircd -p 6667:6667 ngircd-container
+podman run --rm --name ngircd -p 127.0.0.1:6667:6667 ngircd-container
 ```
 
-コンテナを実行しているホストの TCP ポート `6667` に IRC クライアントから接続してください。
+ホスト上の IRC クライアントから `127.0.0.1:6667` に接続してください。この例ではホストのループバックインターフェースにのみポートを公開します。
 
-設定を変更するには `config/ngircd.conf` を編集してイメージを再ビルドしてください。インターネットに公開する前に、設定内容とアクセス制御を確認してください。
+サンプル設定には認証も TLS もなく、ローカルテスト用です。リモート接続を受け付ける前に、アクセス制御と TLS を設定し、サーバー名や設定内容を確認して、必要に応じて公開先のホストアドレスを変更してください。TLS がなければ IRC のパスワードは平文で送信されます。
 
-> **注:** 現在 EPEL 10 には ngIRCd がないため、AlmaLinux 10 イメージには署名済みの EPEL 9 パッケージをインストールします。`Containerfile` は `config/ngircd.conf` と `config/ngircd.motd` を参照します。これらのファイルはまだ追加されていないため、追加するまではイメージをビルドできません。
+設定や MOTD を変更するには `config/` 内のファイルを編集してイメージを再ビルドしてください。設定ファイルと MOTD は `ngircd` ユーザーから読み取り可能にする必要があります。サーバーはコンテナ外からアクセス可能なアドレスで待ち受け、PID ファイルを設定する場合は `/run/ngircd` 以下に置いてください。
+
+## テスト
+
+Podman と Python 3 があれば `python3 tests/smoke.py` でイメージをビルドし、設定の検証と IRC 接続のテストを実行できます。テストはホストのループバックに一時ポートを割り当て、終了時にコンテナを削除します。`NGIRCD_TEST_IMAGE` でテスト用イメージのタグを変更できます。
+
+> **注:** 現在 EPEL 10 には ngIRCd がないため、AlmaLinux 10 イメージには署名済みの EPEL 9 パッケージをインストールします。
